@@ -235,6 +235,20 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
     background: var(--primary);
   }
 
+  .check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  flex-wrap: wrap; /* ✅ позволяет тексту переноситься на новую строку */
+  line-height: 1.3;
+}
+.check input[type="checkbox"] {
+  flex-shrink: 0; /* ✅ не сжимает чекбокс */
+  transform: scale(1.2); /* чуть крупнее на мобильных */
+}
+
   .badge {
   position: relative; /* больше не absolute */
   display: inline-block;
