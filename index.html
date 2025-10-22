@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Генератор сертификатов — адаптивная версия</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@500;700&family=Cormorant+Garamond:wght@400;600;700&family=DM+Serif+Display:ital@0;1&family=Comfortaa:wght@500;700&family=Lobster&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
+<style>
+:root{
+  --primary:#1EAE98; --accent:#6EE7B7;
+  --blob1:#B9FFF0; --blob2:#E6FFF9;
+  --ink:#111827; --muted:#6b7280; --bg:#f0f4f8; --paper:#fff;
+}
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Poppins,system-ui,sans-serif;
+  color:var(--ink);
+  padding:16px;
+  display:flex;
+  justify-content:center;
+}
+.wrap{
+  width:100%;
+  max-width:1000px;
+  display:grid;
+  grid-template-columns:340px 1fr;
+  gap:20px;
+  box-sizing:border-box;
+}
+@media (max-width:980px){
+  .wrap{grid-template-columns:1fr;gap:16px}
+  .stage{order:-1}
+}
+
+.panel{
+  background:linear-gradient(180deg,#fff 0%,#f7f9ff 100%);
+  border-radius:18px;
+  padding:18px 20px 24px;
+  box-shadow:0 8px 20px rgba(0,0,0,.05);
+  border:1px solid #e2e8f0;
+  width:100%;
+  box-sizing:border-box;
+}
+h2{margin:0 0 8px;font-size:20px;font-weight:700;color:var(--primary)}
+label{font-size:13px;font-weight:600;display:block;margin-top:10px;color:#374151}
+input,select{
+  width:100%;
+  margin-top:4px;
+  padding:10px 12px;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  font-family:Poppins,sans-serif;
+  font-size:14px;
+  color:#111827;
+  background:#fff;
+  box-sizing:border-box;
+}
+input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(30,174,152,.2)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:640px){
+  .row{grid-template-columns:1fr}
+  .btn{width:100%}
+}
+.check{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px}
+.btn{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  transition:.2s;
+  box-sizing:border-box;
+}
+.btn.primary{background:var(--primary);color:#fff;border:none}
+.btn.primary:hover{background:#149480;transform:translateY(-1px)}
+.btn{background:#fff;border:1px solid #e5e7eb}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+
+.subscribe{
+  display:block;
+  margin-top:18px;
+  text-align:center;
+  padding:12px 16px;
+  border-radius:14px;
+  background:var(--accent);
+  color:#111827;
+  font-weight:700;
+  text-decoration:none;
+  transition:0.25s;
+  box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+.subscribe:hover{background:var(--primary);color:#fff;transform:translateY(-2px)}
+
+.stage{display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
+.certificate{
+  position:relative;
+  width:420px;
+  max-width:90vw;
+  aspect-ratio:4/5;
+  background:var(--paper);
+  border-radius:20px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:36px;
+  margin:auto;
+  z-index:1;
+}
+
+/* большие круги позади текста */
+.blobs, .dot-frame { position:absolute; inset:0; pointer-events:none; z-index: -1;}
+.blob { position:absolute; border-radius:999px; opacity:.22; filter:blur(3px); z-index:0; }
+.blob.top-left { top:-25%; left:-20%; width:95%; height:95%; background:var(--blob1); }
+.blob.bottom-right { bottom:-25%; right:-20%; width:95%; height:95%; background:var(--blob2); }
+
+.dot-frame{z-index:2}
+.dot{position:absolute;border-radius:999px;transform:translate(-50%,-50%);z-index:2}
+
+.head{
+  text-transform:uppercase;
+  font-weight:700;
+  text-align:center;
+  font-size:18px;
+  letter-spacing:.08em;
+  color:var(--primary);
+  z-index:3;
+}
+.name{
+  font-size:42px;
+  line-height:1.1;
+  margin:10px 0 4px;
+  text-align:center;
+  word-break:break-word;
+  white-space:normal;
+  overflow-wrap:break-word;
+  max-width:90%;
+  margin-left:auto;
+  margin-right:auto;
+  z-index:3;
+}
+.ach{
+  text-align:center;
+  font-size:24px;
+  margin-top:4px;
+  color:var(--primary);
+  word-break:break-word;
+  max-width:90%;
+  margin-left:auto;
+  margin-right:auto;
+  z-index:3;
+}
+.sub{
+  text-align:center;
+  font-size:15px;
+  color:#374151;
+  margin-top:4px;
+  word-break:break-word;
+  max-width:90%;
+  margin:4px auto 0;
+  z-index:3;
+}
+.footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-top:8px;
+  font-size:14px;
+  z-index:3;
+}
+.datebox small{color:var(--muted);display:block}
+.sign{width:180px;text-align:right;color:var(--primary)}
+.line{border-bottom:2px solid currentColor;opacity:.85;margin:0 0 4px}
+.sign-title{font-size:11px;color:#6b7280}
+.badge{
+  position:absolute;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%);
+  background:var(--accent);
+  padding:8px 16px;
+  border-radius:999px;
+  font-weight:700;
+  color:#111827;
+  font-size:14px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+  white-space:nowrap;
+  z-index:3;
+}
+
+/* адаптация для телефона */
+@media(max-width:600px){
+  .certificate{padding:28px;width:100%;max-width:95vw}
+  .name{font-size:30px}
+  .ach{font-size:20px}
+  .sub{font-size:14px}
+  .badge{font-size:12px;padding:6px 12px;bottom:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h2>🎓 Генератор сертификатов</h2>
+
+    <label>Палитра</label>
+    <select id="palette">
+      <option value="mint">Mint (бирюза)</option>
+      <option value="pastel">Pastel (роз/лав/перс)</option>
+      <option value="gold">Gold (янтарь)</option>
+      <option value="ocean">Ocean (сине-зелёная)</option>
+      <option value="candy">Candy (малиново-мятная)</option>
+      <option value="violet">Violet (лиловая)</option>
+    </select>
+
+    <label>Шрифт сертификата</label>
+    <select id="fontStyle">
+      <option value="playfair">Playfair Display</option>
+      <option value="dmserif">DM Serif Display</option>
+      <option value="cormorant">Cormorant Garamond</option>
+      <option value="comfortaa">Comfortaa</option>
+      <option value="lobster">Lobster</option>
+    </select>
+
+    <label>Имя ученика</label>
+    <input id="childName" value="Арина" />
+    <label>Номинация / достижение</label>
+    <input id="achievement" value="Мастер уравнений" />
+    <label>Подзаголовок (за что)</label>
+    <input id="subtitle" value="За настойчивость и старание" />
+
+    <div class="row">
+      <div><label>Дата</label><input id="date"/></div>
+      <div><label>Подписант</label><input id="teacher" value="Лера"/></div>
+    </div>
+
+    <label class="check"><input type="checkbox" id="showSign" checked> Показывать подпись</label>
+
+    <div class="row">
+      <button class="btn primary" id="btnPng">Скачать PNG</button>
+      <button class="btn" id="btnPdf">PDF</button>
+    </div>
+
+    <a href="https://t.me/lera_easy_math" target="_blank" class="subscribe">📢 Подписаться на канал</a>
+    <div class="hint">PNG — для онлайн, PDF — для печати.</div>
+  </div>
+
+  <div class="panel stage">
+    <div id="cert" class="certificate">
+      <div class="blobs">
+        <div class="blob top-left"></div>
+        <div class="blob bottom-right"></div>
+      </div>
+
+      <div id="frame" class="dot-frame"></div>
+
+      <div class="head">СЕРТИФИКАТ ДОСТИЖЕНИЯ</div>
+      <div>
+        <div id="c-name" class="name">Арина</div>
+        <div id="c-ach" class="ach">Мастер уравнений</div>
+        <div id="c-sub" class="sub">За настойчивость и старание</div>
+      </div>
+
+      <div class="footer">
+        <div class="datebox">
+          <small>Дата</small><div id="c-date"><b></b></div>
+        </div>
+        <div id="signBlock" class="sign">
+          <div class="line"></div><div class="sign-title">Подпись</div>
+          <div id="c-teacher">Лера</div>
+        </div>
+      </div>
+
+      <div id="badge" class="badge">Горжусь твоим прогрессом!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const palette=$("palette"),fontStyle=$("fontStyle");
+const childName=$("childName"),achievement=$("achievement"),subtitle=$("subtitle");
+const date=$("date"),teacher=$("teacher"),showSign=$("showSign");
+const cName=$("c-name"),cAch=$("c-ach"),cSub=$("c-sub"),cDate=$("c-date"),cTeacher=$("c-teacher");
+const signBlock=$("signBlock"),frame=$("frame");
+
+const PALETTES={
+  mint:{primary:"#1EAE98",accent:"#6EE7B7",blob1:"#B9FFF0",blob2:"#E6FFF9",dots:["#1EAE98","#6EE7B7","#A7F3D0","#67e8f9"]},
+  pastel:{primary:"#C084FC",accent:"#FBCFE8",blob1:"#FDE7FF",blob2:"#FFF3FA",dots:["#FCA5A5","#FBCFE8","#C7D2FE","#A7F3D0"]},
+  gold:{primary:"#8A6A25",accent:"#E5C179",blob1:"#FFF1C2",blob2:"#FFFBE6",dots:["#b8892e","#e5c179","#f0d99b","#f5e7c5"]},
+  ocean:{primary:"#0EA5E9",accent:"#7DD3FC",blob1:"#BDE9FF",blob2:"#E4FAFF",dots:["#0ea5e9","#06b6d4","#14b8a6","#a5f3fc"]},
+  candy:{primary:"#EC4899",accent:"#F9A8D4",blob1:"#FFD1E6",blob2:"#FFF3F9",dots:["#ec4899","#f43f5e","#34d399","#fde047"]},
+  violet:{primary:"#7C3AED",accent:"#C4B5FD",blob1:"#E3D7FF",blob2:"#F4EEFF",dots:["#7c3aed","#a78bfa","#f5d0fe"]}
+};
+
+const today=new Date().toLocaleDateString("ru-RU");
+date.value=today;cDate.innerHTML="<b>"+today+"</b>";
+
+childName.oninput=()=>cName.textContent=childName.value;
+achievement.oninput=()=>cAch.textContent=achievement.value;
+subtitle.oninput=()=>cSub.textContent=subtitle.value;
+date.oninput=()=>cDate.innerHTML="<b>"+date.value+"</b>";
+teacher.oninput=()=>cTeacher.textContent=teacher.value;
+showSign.onchange=()=>signBlock.style.display=showSign.checked?"block":"none";
+
+function applyFont(){
+  const map={
+    playfair:"'Playfair Display', serif",
+    dmserif:"'DM Serif Display', serif",
+    cormorant:"'Cormorant Garamond', serif",
+    comfortaa:"'Comfortaa', cursive",
+    lobster:"'Lobster', cursive"
+  };
+  cName.style.fontFamily=map[fontStyle.value];
+  cAch.style.fontFamily=map[fontStyle.value];
+  cSub.style.fontFamily="Poppins,sans-serif";
+}
+fontStyle.onchange=applyFont;
+
+function paintDotFrame(colors){
+  frame.innerHTML="";
+  const total=160, base=8, maxR=base+5, inset=maxR+6;
+  const cert=$("cert");
+  const w=cert.clientWidth-inset*2, h=cert.clientHeight-inset*2;
+  const perim=2*(w+h), step=perim/total;
+  const primary=getComputedStyle(document.documentElement).getPropertyValue("--primary").trim();
+
+  let d=0;
+  for(let i=0;i<total;i++){
+    const t=d%perim; let x,y;
+    if(t<w){x=inset+t;y=inset;}
+    else if(t<w+h){x=inset+w;y=inset+(t-w);}
+    else if(t<w+h+w){x=inset+(w-(t-w-h));y=inset+h;}
+    else{x=inset;y=inset+(h-(t-w-h-w));}
+    const dot=document.createElement("div");
+    const r=base+(Math.random()*2);
+    dot.className="dot";
+    dot.style.width=dot.style.height=r+"px";
+    dot.style.left=x+"px"; dot.style.top=y+"px";
+    dot.style.background=Math.random()<0.3?primary:colors[Math.floor(Math.random()*colors.length)];
+    frame.appendChild(dot);
+    d+=step;
+  }
+}
+
+function applyPalette(){
+  const p=PALETTES[palette.value];
+  document.documentElement.style.setProperty("--primary",p.primary);
+  document.documentElement.style.setProperty("--accent",p.accent);
+  document.documentElement.style.setProperty("--blob1",p.blob1);
+  document.documentElement.style.setProperty("--blob2",p.blob2);
+  paintDotFrame(p.dots);
+}
+palette.onchange=applyPalette;
+
+applyFont();applyPalette();
+
+async function download(kind){
+  const cert=$("cert");
+  const dataUrl=await htmlToImage.toPng(cert,{pixelRatio:2,quality:1,backgroundColor:"#fff"});
+  if(kind==="png"){
+    const a=document.createElement("a");
+    a.download=`certificate_${(document.getElementById('childName').value||'student').replace(/\s+/g,'_')}.png`;
+    a.href=dataUrl; a.click();
+  }else{
+    const pdf=new jspdf.jsPDF({orientation:"portrait",unit:"pt",format:"a4"});
+    const img=new Image(); img.src=dataUrl; await new Promise(r=>img.onload=r);
+    const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+    const sc=Math.min(pw/img.width, ph/img.height);
+    const w=img.width*sc, h=img.height*sc;
+    pdf.addImage(dataUrl,"PNG",(pw-w)/2,(ph-h)/2,w,h);
+    pdf.save(`certificate_${(document.getElementById('childName').value||'student').replace(/\s+/g,'_')}.pdf`);
+  }
+}
+document.getElementById("btnPng").onclick=()=>download("png");
+document.getElementById("btnPdf").onclick=()=>download("pdf");
+</script>
+</body>
+</html>
