@@ -3,17 +3,28 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Генератор сертификатов — адаптивная версия</title>
+<title>🎓 Генератор сертификатов — адаптивная версия</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@500;700&family=Cormorant+Garamond:wght@400;600;700&family=DM+Serif+Display:ital@0;1&family=Comfortaa:wght@500;700&family=Lobster&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/3.3.0/dom-to-image-more.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
 
 <style>
 :root{
-  --primary:#1EAE98; --accent:#6EE7B7;
-  --blob1:#B9FFF0; --blob2:#E6FFF9;
-  --ink:#111827; --muted:#6b7280; --bg:#f0f4f8; --paper:#fff;
+  --primary:#1EAE98; 
+  --accent:#6EE7B7;
+  --blob1:#B9FFF0; 
+  --blob2:#E6FFF9;
+  --ink:#111827; 
+  --muted:#6b7280; 
+  --bg:#f0f4f8; 
+  --paper:#fff;
 }
 body{
   margin:0;
@@ -101,8 +112,7 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
 .certificate{
   position:relative;
   width:420px;
-  max-width:90vw;
-  aspect-ratio:4/5;
+  height:560px; /* увеличена высота */
   background:var(--paper);
   border-radius:20px;
   overflow:hidden;
@@ -114,7 +124,7 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
   z-index:1;
 }
 
-/* большие круги позади текста */
+/* декоративные элементы */
 .blobs, .dot-frame { position:absolute; inset:0; pointer-events:none; z-index: -1;}
 .blob { position:absolute; border-radius:999px; opacity:.22; filter:blur(3px); z-index:0; }
 .blob.top-left { top:-25%; left:-20%; width:95%; height:95%; background:var(--blob1); }
@@ -138,8 +148,6 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
   margin:10px 0 4px;
   text-align:center;
   word-break:break-word;
-  white-space:normal;
-  overflow-wrap:break-word;
   max-width:90%;
   margin-left:auto;
   margin-right:auto;
@@ -181,7 +189,7 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
 .badge {
   position: absolute;
   left: 50%;
-  bottom: 60px; /* ⬆️ поднимаем выше, чтобы не наезжал на дату */
+  bottom: 80px; /* выше, чтобы не обрезалось */
   transform: translateX(-50%);
   background: var(--accent);
   padding: 8px 16px;
@@ -190,7 +198,7 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
   color: #111827;
   font-size: 14px;
   box-shadow: 0 3px 10px rgba(0,0,0,.08);
-  max-width: 80%; /* ⬅️ чтобы на маленьких экранах не вылезал */
+  max-width: 80%;
   text-align: center;
   line-height: 1.3;
 }
@@ -202,75 +210,6 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
   .ach{font-size:20px}
   .sub{font-size:14px}
   .badge{font-size:12px;padding:6px 12px;bottom:16px}
-
-  /* Мобильная адаптивность */
-@media (max-width: 600px) {
-  .wrap {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .panel {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 16px;
-  }
-
-  .certificate {
-    transform: scale(0.9);
-    transform-origin: top center;
-  }
-
-  input, select {
-    font-size: 16px; /* чтобы не зумило на iOS */
-  }
-
-  .btn, .btn.primary {
-    width: 100%;
-    font-size: 16px;
-    padding: 14px 0;
-  }
-
-  .btn.primary {
-    background: var(--primary);
-  }
-
-  .check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  font-size: 13px;
-  flex-wrap: wrap; /* ✅ позволяет тексту переноситься на новую строку */
-  line-height: 1.3;
-}
-.check input[type="checkbox"] {
-  flex-shrink: 0; /* ✅ не сжимает чекбокс */
-  transform: scale(1.2); /* чуть крупнее на мобильных */
-}
-
-  .badge {
-  position: relative; /* больше не absolute */
-  display: inline-block;
-  align-self: center;
-  margin-top: 40px; /* отступ от линии подписи */
-  background: var(--accent);
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-weight: 700;
-  color: #111827;
-  font-size: 15px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
-  text-align: center;
-  max-width: 80%;
-}
-
-  h2 {
-    text-align: center;
-    font-size: 18px;
-  }
-}
-
 }
 </style>
 </head>
@@ -394,30 +333,58 @@ function applyFont(){
 fontStyle.onchange=applyFont;
 
 function paintDotFrame(colors){
-  frame.innerHTML="";
-  const total=160, base=8, maxR=base+5, inset=maxR+6;
-  const cert=$("cert");
-  const w=cert.clientWidth-inset*2, h=cert.clientHeight-inset*2;
-  const perim=2*(w+h), step=perim/total;
-  const primary=getComputedStyle(document.documentElement).getPropertyValue("--primary").trim();
+  frame.innerHTML = "";
+  const cert = $("cert");
 
-  let d=0;
-  for(let i=0;i<total;i++){
-    const t=d%perim; let x,y;
-    if(t<w){x=inset+t;y=inset;}
-    else if(t<w+h){x=inset+w;y=inset+(t-w);}
-    else if(t<w+h+w){x=inset+(w-(t-w-h));y=inset+h;}
-    else{x=inset;y=inset+(h-(t-w-h-w));}
-    const dot=document.createElement("div");
-    const r=base+(Math.random()*2);
-    dot.className="dot";
-    dot.style.width=dot.style.height=r+"px";
-    dot.style.left=x+"px"; dot.style.top=y+"px";
-    dot.style.background=Math.random()<0.3?primary:colors[Math.floor(Math.random()*colors.length)];
+  // уменьшаем inset, чтобы точки были ближе к краю
+  const base = 7;
+  const inset = base + 3;
+  const w = cert.clientWidth - inset * 2;
+  const h = cert.clientHeight - inset * 2;
+
+  // немного больше точек — рамка плотнее
+  const total = 200;
+  const perim = 2 * (w + h);
+  const step = perim / total;
+
+  const primary = getComputedStyle(document.documentElement)
+    .getPropertyValue("--primary")
+    .trim();
+
+  let d = 0;
+  for (let i = 0; i < total; i++) {
+    const t = d % perim;
+    let x, y;
+    if (t < w) {
+      x = inset + t;
+      y = inset;
+    } else if (t < w + h) {
+      x = inset + w;
+      y = inset + (t - w);
+    } else if (t < w + h + w) {
+      x = inset + (w - (t - w - h));
+      y = inset + h;
+    } else {
+      x = inset;
+      y = inset + (h - (t - w - h - w));
+    }
+
+    const dot = document.createElement("div");
+    const r = base + Math.random() * 1.5;
+    dot.className = "dot";
+    dot.style.width = dot.style.height = r + "px";
+    dot.style.left = x + "px";
+    dot.style.top = y + "px";
+    dot.style.background =
+      Math.random() < 0.25
+        ? primary
+        : colors[Math.floor(Math.random() * colors.length)];
+
     frame.appendChild(dot);
-    d+=step;
+    d += step;
   }
 }
+
 
 function applyPalette(){
   const p=PALETTES[palette.value];
@@ -430,26 +397,53 @@ function applyPalette(){
 palette.onchange=applyPalette;
 
 applyFont();applyPalette();
+async function download(kind) {
+  const cert = document.getElementById("cert");
 
-async function download(kind){
-  const cert=$("cert");
-  const dataUrl=await htmlToImage.toPng(cert,{pixelRatio:2,quality:1,backgroundColor:"#fff"});
-  if(kind==="png"){
-    const a=document.createElement("a");
-    a.download=`certificate_${(document.getElementById('childName').value||'student').replace(/\s+/g,'_')}.png`;
-    a.href=dataUrl; a.click();
-  }else{
-    const pdf=new jspdf.jsPDF({orientation:"portrait",unit:"pt",format:"a4"});
-    const img=new Image(); img.src=dataUrl; await new Promise(r=>img.onload=r);
-    const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
-    const sc=Math.min(pw/img.width, ph/img.height);
-    const w=img.width*sc, h=img.height*sc;
-    pdf.addImage(dataUrl,"PNG",(pw-w)/2,(ph-h)/2,w,h);
-    pdf.save(`certificate_${(document.getElementById('childName').value||'student').replace(/\s+/g,'_')}.pdf`);
+  // гарантируем, что шрифты подгружены
+  await document.fonts.ready;
+
+  // делаем скриншот видимой области без изменения размеров
+  const canvas = await html2canvas(cert, {
+    scale: 3, // чёткое изображение
+    backgroundColor: "#ffffff",
+    useCORS: true,
+    logging: false,
+  });
+
+  const dataUrl = canvas.toDataURL("image/png", 1.0);
+
+  if (kind === "png") {
+    const link = document.createElement("a");
+    const dateStr = new Date().toLocaleDateString("ru-RU").replace(/\./g, "-");
+    link.download = `certificate_${(childName.value || "student")
+      .replace(/\s+/g, "_")}_${dateStr}.png`;
+    link.href = dataUrl;
+    link.click();
+  } else {
+    const pdf = new jspdf.jsPDF({
+      orientation: "portrait",
+      unit: "pt",
+      format: "a4",
+    });
+    const img = new Image();
+    img.src = dataUrl;
+    await new Promise((r) => (img.onload = r));
+    const pw = pdf.internal.pageSize.getWidth();
+    const ph = pdf.internal.pageSize.getHeight();
+    const sc = Math.min(pw / img.width, ph / img.height);
+    const w = img.width * sc;
+    const h = img.height * sc;
+    pdf.addImage(img, "PNG", (pw - w) / 2, (ph - h) / 2, w, h);
+    pdf.save(
+      `certificate_${(childName.value || "student").replace(/\s+/g, "_")}.pdf`
+    );
   }
 }
-document.getElementById("btnPng").onclick=()=>download("png");
-document.getElementById("btnPdf").onclick=()=>download("pdf");
+
+
+$("btnPng").onclick=()=>download("png");
+$("btnPdf").onclick=()=>download("pdf");
 </script>
 </body>
 </html>
