@@ -211,6 +211,135 @@ input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0
   .sub{font-size:14px}
   .badge{font-size:12px;padding:6px 12px;bottom:16px}
 }
+
+/* === Мобильная адаптивность панели === */
+@media (max-width: 640px) {
+
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .panel {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  h2 {
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 12px;
+    display: block;
+  }
+
+  input, select {
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .btn, .btn.primary {
+    width: 100%;
+    font-size: 16px;
+    padding: 14px;
+    margin-top: 10px;
+    border-radius: 12px;
+  }
+
+  .btn.primary {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+  }
+
+  .btn.primary:hover {
+    background: #149480;
+  }
+
+  .subscribe {
+    margin-top: 14px;
+    font-size: 15px;
+    padding: 14px;
+    display: block;
+    text-align: center;
+    background: var(--accent);
+    color: #111827;
+    font-weight: 700;
+    border-radius: 14px;
+  }
+
+  .hint {
+    font-size: 13px;
+    text-align: center;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* чтобы не было горизонтального скролла */
+  body {
+    overflow-x: hidden;
+  }
+}
+/* === Адаптивность сертификата === */
+@media (max-width: 640px) {
+  .certificate {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: 16px;
+    padding: 24px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    transform: none !important;
+  }
+
+  .name {
+    font-size: 28px;
+  }
+
+  .ach {
+    font-size: 20px;
+  }
+
+  .sub {
+    font-size: 14px;
+  }
+
+  .badge {
+    position: relative;
+    bottom: auto;
+    margin-top: 32px;
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sign {
+    text-align: center;
+  }
+}
+
 </style>
 </head>
 <body>
